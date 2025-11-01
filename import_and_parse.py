@@ -71,14 +71,35 @@ def parse_date_from_filename(filename):
     return None
 
 
-def get_quarter(month):
-    """Get quarter from month (1-4)"""
-    return (month - 1) // 3 + 1
+def get_date_from_user(fit_filename):
+    """Get date from user input when cannot parse from filename"""
+    print(f"❌ Could not parse date from filename: {fit_filename}")
+    print("Please enter the date of the training:")
+    
+    while True:
+        year = input("Year (YYYY): ").strip()
+        month = input("Month (MM): ").strip()
+        day = input("Day (DD): ").strip()
+        time_input = input("Time (HH:MM, or leave blank): ").strip()
+        
+        try:
+            date_str = f"{year}-{month}-{day}"
+            if time_input:
+                ride_date = datetime.strptime(f"{date_str} {time_input}", "%Y-%m-%d %H:%M")
+            else:
+                ride_date = datetime.strptime(date_str, "%Y-%m-%d")
+            return ride_date
+        except ValueError as e:
+            print(f"❌ Invalid date format: {e}")
+            print("Please try again with valid numbers.")
+            use_current = input("Use current date and time instead? (y/N): ").strip().lower()
+            if use_current == 'y':
+                return datetime.now()
 
 
 def get_unique_ride_name(athlete_dir, base_date, training_type):
     """Generate a unique ride name, adding suffix if same date training exists"""
-    base_name = f"{base_date.strftime('%Y-%m-%d')}_{training_type}"
+    base_name = f"{base_date.strftime('%Y-%m-%d')}"
     
     # Check if this ride name already exists
     all_data_dir = athlete_dir / "AllData"
@@ -88,7 +109,7 @@ def get_unique_ride_name(athlete_dir, base_date, training_type):
         return base_name
     
     # If base name exists, try with time component
-    name_with_time = f"{base_date.strftime('%Y-%m-%d-%H-%M')}_{training_type}"
+    name_with_time = f"{base_date.strftime('%Y-%m-%d-%H-%M')}"
     if name_with_time not in existing_rides:
         return name_with_time
     
@@ -101,63 +122,112 @@ def get_unique_ride_name(athlete_dir, base_date, training_type):
         counter += 1
 
 
-def parse_fit_metrics(fit_path: Path):
-    """Extract session-level metrics and record data into files."""
-    parsed_dir = fit_path.parent
-    metrics = {}
+def datetime_serializer(obj):
+    """Custom JSON serializer for datetime objects"""
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError(f"Type {type(obj)} not serializable")
 
+
+def parse_fit_metrics(fit_path: Path, parsed_dir: Path):
+    """Extract session-level metrics and record data into files."""
+    print(f"🔍 Parsing FIT file: {fit_path.name}")
+    
     try:
         fit = FitFile(str(fit_path))
-        # Save session summary
+        
+        # Parse session data (time-independent metrics)
+        session_data = {}
+        session_count = 0
         for msg in fit.get_messages("session"):
+            session_count += 1
             for d in msg:
-                metrics[d.name] = d.value
-        with open(parsed_dir / "session.json", "w") as f:
-            json.dump(metrics, f, indent=4)
-
-        # Save record data (time series)
-        records_csv = parsed_dir / "records.csv"
+                # Convert non-serializable types to strings
+                if hasattr(d.value, '__dict__'):
+                    session_data[d.name] = str(d.value)
+                else:
+                    session_data[d.name] = d.value
+        
+        print(f"📊 Found {session_count} session(s) with {len(session_data)} metrics")
+        
+        # Save session data as CSV
+        session_csv = parsed_dir / "session_metrics.csv"
+        with open(session_csv, "w") as f:
+            f.write("metric,value\n")
+            for key, value in session_data.items():
+                # Convert datetime objects to string for CSV
+                if isinstance(value, datetime):
+                    value = value.isoformat()
+                f.write(f'"{key}","{value}"\n')
+        
+        # Save session data as JSON as well
+        with open(parsed_dir / "session_metrics.json", "w") as f:
+            json.dump(session_data, f, indent=4, default=datetime_serializer)
+        
+        # Parse record data (time-series metrics)
+        records_csv = parsed_dir / "time_series.csv"
+        record_count = 0
         with open(records_csv, "w") as f:
-            f.write("timestamp,heart_rate,power,cadence,speed,altitude\n")
+            # Write header
+            f.write("timestamp,heart_rate,power,cadence,speed,altitude,distance,temperature\n")
+            
+            # Write data
             for record in fit.get_messages("record"):
-                row = {}
+                record_count += 1
+                row_data = {
+                    "timestamp": "",
+                    "heart_rate": "",
+                    "power": "",
+                    "cadence": "",
+                    "speed": "",
+                    "altitude": "",
+                    "distance": "",
+                    "temperature": ""
+                }
+                
                 for d in record:
-                    row[d.name] = d.value
-                f.write(",".join(str(row.get(x, "")) for x in ["timestamp", "heart_rate", "power", "cadence", "speed", "altitude"]) + "\n")
+                    if d.name in row_data:
+                        # Convert datetime to string for CSV
+                        if isinstance(d.value, datetime):
+                            row_data[d.name] = d.value.isoformat()
+                        else:
+                            row_data[d.name] = d.value
+                
+                # Write the row
+                f.write(",".join(str(row_data[x]) for x in row_data.keys()) + "\n")
+        
+        print(f"⏱️  Found {record_count} time series records")
+        print(f"✅ Fit file parsed successfully!")
+        print(f"   → Session metrics: {session_csv}")
+        print(f"   → Time series data: {records_csv}")
 
     except Exception as e:
-        print(f"⚠️ Could not parse {fit_path.name}: {e}")
+        print(f"❌ Error parsing {fit_path.name}: {e}")
+        import traceback
+        traceback.print_exc()
 
 
 def create_symlinks(athlete_dir, ride_name, training_type, ride_date, dest_fit, parsed_dir):
     """Create organized symlinks in by_month and by_training directories"""
-    # Calculate quarter
-    quarter = get_quarter(ride_date.month)
-    quarter_str = f"Q{quarter}"
-    
     # Create directory paths
     month_dir = athlete_dir / "by_month" / ride_date.strftime("%Y-%m")
-    quarter_dir = athlete_dir / "by_quarter" / f"{ride_date.year}-{quarter_str}"
     training_dir = athlete_dir / "by_training" / training_type
     
     # Create directories
     month_dir.mkdir(parents=True, exist_ok=True)
-    quarter_dir.mkdir(parents=True, exist_ok=True)
     training_dir.mkdir(parents=True, exist_ok=True)
     
-    # Create training folder in each organizational directory
-    month_training_dir = month_dir / ride_name
-    quarter_training_dir = quarter_dir / ride_name
-    training_type_dir = training_dir / ride_name
+    # Create training folder in each organizational directory (using just date, no training type)
+    base_folder_name = ride_name  # This is now just the date (YYYY-MM-DD) or with suffix
+    month_training_dir = month_dir / base_folder_name
+    training_type_dir = training_dir / base_folder_name
     
     month_training_dir.mkdir(exist_ok=True)
-    quarter_training_dir.mkdir(exist_ok=True)
     training_type_dir.mkdir(exist_ok=True)
     
     # Create symlinks to both FIT file and ParsedData
     symlink_pairs = [
         (month_training_dir, dest_fit, parsed_dir),
-        (quarter_training_dir, dest_fit, parsed_dir),
         (training_type_dir, dest_fit, parsed_dir)
     ]
     
@@ -176,7 +246,7 @@ def create_symlinks(athlete_dir, ride_name, training_type, ride_date, dest_fit, 
         except FileExistsError:
             pass
     
-    return month_training_dir, quarter_training_dir, training_type_dir
+    return month_training_dir, training_type_dir
 
 
 def main():
@@ -221,25 +291,17 @@ def main():
     else:
         print(f"✅ Found file: {fit_path}")
 
-    # === Parse date from filename ===
+    # === Parse date from filename or get from user ===
     ride_date = parse_date_from_filename(fit_path.name)
-    
+
     if not ride_date:
-        print(f"❌ Could not parse date from filename: {fit_path.name}")
-        print("Please enter the date and time of the training:")
-        date_input = input("Date (YYYY-MM-DD): ").strip()
-        time_input = input("Time (HH:MM, or leave blank): ").strip()
-        
-        try:
-            if time_input:
-                ride_date = datetime.strptime(f"{date_input} {time_input}", "%Y-%m-%d %H:%M")
-            else:
-                ride_date = datetime.strptime(date_input, "%Y-%m-%d")
-        except ValueError:
-            print("❌ Invalid date format. Using current date.")
-            ride_date = datetime.now()
+        ride_date = get_date_from_user(fit_path.name)
     else:
         print(f"✅ Parsed training date: {ride_date.strftime('%Y-%m-%d %H:%M')}")
+        # Confirm with user if this is correct
+        confirm = input("Is this date correct? (Y/n): ").strip().lower()
+        if confirm == 'n':
+            ride_date = get_date_from_user(fit_path.name)
 
     # === List available training templates ===
     trainings = sorted([f.name for f in TRAININGS_DIR.glob("*.zwo")])
@@ -256,7 +318,7 @@ def main():
     training_types = ["Z2", "Z3", "Z4", "Climb", "Sprint"]
     training_type = choose("Select the type of training:", training_types)
 
-    # === Build unique ride name ===
+    # === Build unique ride name (now without training type) ===
     ride_name = get_unique_ride_name(athlete_dir, ride_date, training_type)
     print(f"✅ Using ride name: {ride_name}")
 
@@ -276,7 +338,6 @@ def main():
         "date": ride_date.strftime("%Y-%m-%d"),
         "time": ride_date.strftime("%H:%M"),
         "day_of_week": ride_date.strftime("%A"),
-        "quarter": f"Q{get_quarter(ride_date.month)}",
         "training_type": training_type,
         "training_template": chosen_training,
         "preworkout_nutrition": choose("Pre-workout nutrition:", nutrition_opts),
@@ -294,24 +355,29 @@ def main():
 
     # === Save metadata.json ===
     with open(parsed_dir / "metadata.json", "w") as f:
-        json.dump(metadata, f, indent=4)
+        json.dump(metadata, f, indent=4, default=datetime_serializer)
 
     # === Parse the fit file ===
-    parse_fit_metrics(dest_fit)
+    print(f"📂 Parsing FIT file and creating CSV files...")
+    parse_fit_metrics(dest_fit, parsed_dir)
 
     # === Create organized symlinks ===
-    month_dir, quarter_dir, training_type_dir = create_symlinks(
+    month_dir, training_type_dir = create_symlinks(
         athlete_dir, ride_name, training_type, ride_date, dest_fit, parsed_dir
     )
 
-    print(f"\n✅ Training '{ride_name}' added for {athlete}.")
-    print(f"  → Fit file copied to {dest_fit}")
-    print(f"  → Metadata saved to {parsed_dir}/metadata.json")
-    print(f"  → Organized directories created:")
-    print(f"     - by_month: {month_dir}")
-    print(f"     - by_quarter: {quarter_dir}")
-    print(f"     - by_training: {training_type_dir}")
-    print(f"  → Each directory contains symlinks to both .fit file and ParsedData")
+    print(f"\n🎉 SUCCESS: Training '{ride_name}' added for {athlete}")
+    print("=" * 50)
+    print(f"📁 Files created:")
+    print(f"   • Fit file: {dest_fit}")
+    print(f"   • Metadata: {parsed_dir / 'metadata.json'}")
+    print(f"   • Session metrics: {parsed_dir / 'session_metrics.csv'}")
+    print(f"   • Time series data: {parsed_dir / 'time_series.csv'}")
+    print(f"   • Session JSON: {parsed_dir / 'session_metrics.json'}")
+    print(f"\n📂 Organizational structure:")
+    print(f"   • by_month: {month_dir} (with symlinks to .fit and ParsedData)")
+    print(f"   • by_training: {training_type_dir} (with symlinks to .fit and ParsedData)")
+    print("=" * 50)
 
 
 if __name__ == "__main__":
