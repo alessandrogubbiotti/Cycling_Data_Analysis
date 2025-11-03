@@ -1,0 +1,21 @@
+{
+    "athlete": "Alessandro",
+    "ride_name": "2025-11-01",
+    "date": "2025-11-01",
+    "time": "11:54",
+    "day_of_week": "Saturday",
+    "training_type": "Z2",
+    "training_template": "Z2_low_cadence_1.zwo",
+    "ftp": 250,
+    "preworkout_nutrition": "Surplus",
+    "hydration_ml_pre": 200,
+    "hydration_ml_during": 500,
+    "minerals": {
+        "potassium_g": 4.0,
+        "magnesium_g": 4.0,
+        "zinc_g": 2.0,
+        "vitamin_c_g": 2.0
+    },
+    "perceived_effort": "Easy",
+    "notes": ""
+}

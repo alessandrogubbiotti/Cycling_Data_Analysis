@@ -340,7 +340,8 @@ def main():
         "day_of_week": ride_date.strftime("%A"),
         "training_type": training_type,
         "training_template": chosen_training,
-        "preworkout_nutrition": choose("Pre-workout nutrition:", nutrition_opts),
+       	"ftp": int(input("Athlete's FTP: " )), 
+	"preworkout_nutrition": choose("Pre-workout nutrition:", nutrition_opts),
         "hydration_ml_pre": int(input("Water before training (ml): ")),
         "hydration_ml_during": int(input("Water during training (ml): ")),
         "minerals": {
