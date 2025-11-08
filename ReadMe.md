@@ -185,4 +185,23 @@ Point GoldenCheetah to the `AllData/` directory or use the helper script to open
 5. Introduce some algorithm to recognize the intervals to classify non guided trainings
 6. Add some metrics (Blood sugar, CO2 emitted (I should buy the Calibre gadget))
 </details>
+# 🚧 Work in Progress
+
+## Current Status
+Building interactive cycling data analysis dashboard with:
+
+### ✅ Completed
+- Data pipeline from .fit files
+- Basic HTML report generation  
+- GitHub Actions automation
+
+### 🚧 In Progress
+- Interactive training visualizations
+- Drill-down training analysis
+- Multi-dimensional plots
+
+### 📋 Planned
+- [ ] Interval search across sessions
+- [ ] Progress tracking over time
+- [ ] Workout comparison tools
 
