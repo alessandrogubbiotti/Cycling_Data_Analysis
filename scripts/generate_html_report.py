@@ -91,7 +91,9 @@ def generate_interactive_dashboard(trainings_data):
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cycling Training Dashboard</title>
-    
+   
+
+ 
     <!-- Plotly.js for interactive charts -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     
@@ -199,7 +201,22 @@ def generate_interactive_dashboard(trainings_data):
             <h1>🚴 Interactive Cycling Training Dashboard</h1>
             <p>Explore your training data across multiple dimensions</p>
         </div>
-        
+       
+        <!-- 🚧 WORK IN PROGRESS BANNER - PUT IT HERE -->
+        <div class="wip-banner" style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 20px; margin: 20px 0; border-radius: 4px;">
+            <h3 style="margin-top: 0; color: #856404;">🚧 Work in Progress</h3>
+            <p style="margin-bottom: 10px;"><strong>Current Focus:</strong> Building interactive training dashboard</p>
+            <ul style="margin-bottom: 10px;">
+                <li>Multi-dimensional training visualization</li>
+                <li>Clickable points with drill-down details</li>
+                <li>Interval search functionality (coming soon)</li>
+            </ul>
+            <p style="margin: 0; font-style: italic; color: #856404;">
+                Last updated: {current_time}
+            </p>
+        </div>
+
+ 
         <!-- Visualization Controls -->
         <div class="dashboard-section">
             <h2>Training Overview</h2>
