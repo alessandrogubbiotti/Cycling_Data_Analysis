@@ -91,9 +91,7 @@ def generate_interactive_dashboard(trainings_data):
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cycling Training Dashboard</title>
-   
-
- 
+    
     <!-- Plotly.js for interactive charts -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     
@@ -117,6 +115,33 @@ def generate_interactive_dashboard(trainings_data):
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        
+        .wip-banner {{
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }}
+        
+        .wip-banner h3 {{
+            margin-top: 0;
+            color: #856404;
+        }}
+        
+        .wip-banner ul {{
+            margin-bottom: 10px;
+        }}
+        
+        .wip-banner p {{
+            margin-bottom: 10px;
+        }}
+        
+        .wip-banner .timestamp {{
+            margin: 0;
+            font-style: italic;
+            color: #856404;
         }}
         
         .dashboard-section {{
@@ -201,22 +226,19 @@ def generate_interactive_dashboard(trainings_data):
             <h1>🚴 Interactive Cycling Training Dashboard</h1>
             <p>Explore your training data across multiple dimensions</p>
         </div>
-       
-        <!-- 🚧 WORK IN PROGRESS BANNER - PUT IT HERE -->
-        <div class="wip-banner" style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 20px; margin: 20px 0; border-radius: 4px;">
-            <h3 style="margin-top: 0; color: #856404;">🚧 Work in Progress</h3>
-            <p style="margin-bottom: 10px;"><strong>Current Focus:</strong> Building interactive training dashboard</p>
-            <ul style="margin-bottom: 10px;">
+        
+        <!-- 🚧 WORK IN PROGRESS BANNER -->
+        <div class="wip-banner">
+            <h3>🚧 Work in Progress</h3>
+            <p><strong>Current Focus:</strong> Building interactive training dashboard</p>
+            <ul>
                 <li>Multi-dimensional training visualization</li>
                 <li>Clickable points with drill-down details</li>
                 <li>Interval search functionality (coming soon)</li>
             </ul>
-            <p style="margin: 0; font-style: italic; color: #856404;">
-                Last updated: {current_time}
-            </p>
+            <p class="timestamp">Last updated: {current_time}</p>
         </div>
 
- 
         <!-- Visualization Controls -->
         <div class="dashboard-section">
             <h2>Training Overview</h2>
@@ -365,22 +387,22 @@ def generate_interactive_dashboard(trainings_data):
             // Update training info cards
             const infoHtml = `
                 <div class="info-card">
-                    <strong>Date</strong><br>{training.date}
+                    <strong>Date</strong><br>${{training.date}}
                 </div>
                 <div class="info-card">
-                    <strong>Workout Type</strong><br>{training.workout_type}
+                    <strong>Workout Type</strong><br>${{training.workout_type}}
                 </div>
                 <div class="info-card">
-                    <strong>Duration</strong><br>{training.duration_minutes} min
+                    <strong>Duration</strong><br>${{training.duration_minutes}} min
                 </div>
                 <div class="info-card">
-                    <strong>Training Load</strong><br>{training.training_load} TSS
+                    <strong>Training Load</strong><br>${{training.training_load}} TSS
                 </div>
                 <div class="info-card">
-                    <strong>Avg Power</strong><br>{training.avg_power}W
+                    <strong>Avg Power</strong><br>${{training.avg_power}}W
                 </div>
                 <div class="info-card">
-                    <strong>Avg HR</strong><br>{training.avg_heart_rate} bpm
+                    <strong>Avg HR</strong><br>${{training.avg_heart_rate}} bpm
                 </div>
             `;
             document.getElementById('training-info').innerHTML = infoHtml;
