@@ -205,31 +205,44 @@ def parse_fit_metrics(fit_path: Path, parsed_dir: Path):
         print(f"❌ Error parsing {fit_path.name}: {e}")
         import traceback
         traceback.print_exc()
-
-
-def create_symlinks(athlete_dir, ride_name, training_type, ride_date, dest_fit, parsed_dir):
-    """Create organized symlinks in by_month and by_training directories"""
-    # Create directory paths
+def create_symlinks(athlete_dir, ride_name, training_type, training_template, ride_date, dest_fit, parsed_dir):
+    """
+    Create organized symlinks in by_month, by_zone, and by_training directories
+    """
+    # Create directory paths for all three organizational methods
     month_dir = athlete_dir / "by_month" / ride_date.strftime("%Y-%m")
-    training_dir = athlete_dir / "by_training" / training_type
+    zone_dir = athlete_dir / "by_zone" / training_type
+    
+    # For by_training, use the exact training template name (no hierarchy)
+    training_dir = athlete_dir / "by_training" / training_template if training_template else None
     
     # Create directories
     month_dir.mkdir(parents=True, exist_ok=True)
-    training_dir.mkdir(parents=True, exist_ok=True)
+    zone_dir.mkdir(parents=True, exist_ok=True)
+    if training_dir:
+        training_dir.mkdir(parents=True, exist_ok=True)
     
-    # Create training folder in each organizational directory (using just date, no training type)
-    base_folder_name = ride_name  # This is now just the date (YYYY-MM-DD) or with suffix
+    # Create training folder in each organizational directory
+    base_folder_name = ride_name
     month_training_dir = month_dir / base_folder_name
-    training_type_dir = training_dir / base_folder_name
+    zone_training_dir = zone_dir / base_folder_name
+    
+    # For by_training, create the ride folder directly under the training template directory
+    training_training_dir = training_dir / base_folder_name if training_dir else None
     
     month_training_dir.mkdir(exist_ok=True)
-    training_type_dir.mkdir(exist_ok=True)
+    zone_training_dir.mkdir(exist_ok=True)
+    if training_training_dir:
+        training_training_dir.mkdir(exist_ok=True)
     
-    # Create symlinks to both FIT file and ParsedData
+    # Create symlinks to both FIT file and ParsedData for all directories
     symlink_pairs = [
         (month_training_dir, dest_fit, parsed_dir),
-        (training_type_dir, dest_fit, parsed_dir)
+        (zone_training_dir, dest_fit, parsed_dir)
     ]
+    
+    if training_training_dir:
+        symlink_pairs.append((training_training_dir, dest_fit, parsed_dir))
     
     for target_dir, fit_source, parsed_source in symlink_pairs:
         try:
@@ -246,7 +259,7 @@ def create_symlinks(athlete_dir, ride_name, training_type, ride_date, dest_fit, 
         except FileExistsError:
             pass
     
-    return month_training_dir, training_type_dir
+    return month_training_dir, zone_training_dir, training_training_dir
 
 
 def main():
@@ -302,9 +315,8 @@ def main():
         confirm = input("Is this date correct? (Y/n): ").strip().lower()
         if confirm == 'n':
             ride_date = get_date_from_user(fit_path.name)
-
-    # === List available training templates ===
-    trainings = sorted([f.name for f in TRAININGS_DIR.glob("*.zwo")])
+# === List available training templates ===
+    trainings = sorted([f.name for f in TRAININGS_DIR.glob("*") if f.is_dir()])
     if not trainings:
         print("⚠️ No training templates found in Trainings/.")
         chosen_training = None
@@ -312,9 +324,11 @@ def main():
         print("\nAvailable training templates:")
         for i, t in enumerate(trainings):
             print(f"  {i + 1}) {t}")
-        chosen_training = trainings[int(input("Select training: ")) - 1]
+        training_choice = int(input("Select training: ")) - 1
+        chosen_training = trainings[training_choice]
+        print(f"✅ Selected training template: {chosen_training}")
 
-    # === Training type ===
+    # === Training type (zone-based) ===
     training_types = ["Z2", "Z3", "Z4", "Climb", "Sprint"]
     training_type = choose("Select the type of training:", training_types)
 
@@ -361,10 +375,9 @@ def main():
     # === Parse the fit file ===
     print(f"📂 Parsing FIT file and creating CSV files...")
     parse_fit_metrics(dest_fit, parsed_dir)
-
-    # === Create organized symlinks ===
-    month_dir, training_type_dir = create_symlinks(
-        athlete_dir, ride_name, training_type, ride_date, dest_fit, parsed_dir
+# === Create organized symlinks for ALL three methods ===
+    month_dir, zone_dir, training_dir = create_symlinks(
+        athlete_dir, ride_name, training_type, chosen_training, ride_date, dest_fit, parsed_dir
     )
 
     print(f"\n🎉 SUCCESS: Training '{ride_name}' added for {athlete}")
@@ -377,7 +390,9 @@ def main():
     print(f"   • Session JSON: {parsed_dir / 'session_metrics.json'}")
     print(f"\n📂 Organizational structure:")
     print(f"   • by_month: {month_dir} (with symlinks to .fit and ParsedData)")
-    print(f"   • by_training: {training_type_dir} (with symlinks to .fit and ParsedData)")
+    print(f"   • by_zone: {zone_dir} (with symlinks to .fit and ParsedData)")
+    if training_dir:
+        print(f"   • by_training: {training_dir} (with symlinks to .fit and ParsedData)")
     print("=" * 50)
 
 

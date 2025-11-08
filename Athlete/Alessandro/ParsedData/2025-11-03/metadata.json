@@ -1,0 +1,21 @@
+{
+    "athlete": "Alessandro",
+    "ride_name": "2025-11-03",
+    "date": "2025-11-03",
+    "time": "18:18",
+    "day_of_week": "Monday",
+    "training_type": "Climb",
+    "training_template": "Free_Ride",
+    "ftp": 250,
+    "preworkout_nutrition": "Big Surplus",
+    "hydration_ml_pre": 200,
+    "hydration_ml_during": 500,
+    "minerals": {
+        "potassium_g": 2.0,
+        "magnesium_g": 4.0,
+        "zinc_g": 2.0,
+        "vitamin_c_g": 2.0
+    },
+    "perceived_effort": "Difficult",
+    "notes": ""
+}

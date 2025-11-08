@@ -1,0 +1,4 @@
+start_time,end_time,duration,xml_type,target_power_pct,target_power_low_pct,target_power_high_pct,target_cadence,description,source,type,zone_class,power_type
+0.0,600.0,600.0,warmup,0.0,32.179998999999995,74.979997,0.0,Warmup,zwo,warmup,Warm up,ramp
+600.0,6000.0,5400.0,steadystate,72.179997,0.0,0.0,70.0,SteadyState,zwo,steadystate,Z2,steady
+6000.0,6600.0,600.0,cooldown,0.0,80.180001,24.98,0.0,Cooldown,zwo,cooldown,Cooling down,ramp

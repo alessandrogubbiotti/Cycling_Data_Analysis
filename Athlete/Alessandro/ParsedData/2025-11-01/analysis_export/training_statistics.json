@@ -1,0 +1,14 @@
+{
+  "interval_statistics": [],
+  "overall_statistics": {
+    "total_duration": NaN,
+    "total_records": 6620,
+    "interval_count": 0,
+    "power_overall_avg": 170.84622356495467,
+    "power_overall_std": 27.244666673548434,
+    "normalized_power": 174.9499771762743,
+    "cadence_overall_avg": 69.25181268882176,
+    "hr_overall_avg": 145.4271903323263,
+    "hr_overall_max": "166"
+  }
+}

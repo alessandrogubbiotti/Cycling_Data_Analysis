@@ -1,0 +1,21 @@
+{
+    "athlete": "Alessandro",
+    "ride_name": "2025-11-05",
+    "date": "2025-11-05",
+    "time": "11:56",
+    "day_of_week": "Wednesday",
+    "training_type": "Climb",
+    "training_template": "Light_Sustained_Efforts",
+    "ftp": 250,
+    "preworkout_nutrition": "Surplus",
+    "hydration_ml_pre": 300,
+    "hydration_ml_during": 400,
+    "minerals": {
+        "potassium_g": 2.0,
+        "magnesium_g": 0.0,
+        "zinc_g": 0.0,
+        "vitamin_c_g": 0.0
+    },
+    "perceived_effort": "Medium",
+    "notes": ""
+}

@@ -47,6 +47,28 @@ class TrainingEnhancer:
         self.df = df.copy()
         self.metadata = metadata or {}
         self.ftp = get_ftp_from_metadata(metadata)
+
+    
+    def _print_enhancement_summary(self) -> None:
+        """Print summary of enhancement"""
+        target_power_data = self.df['target_power'].dropna()
+        target_cadence_data = self.df['target_cadence'].dropna()
+        
+        enhancement_pct = (len(target_power_data) / len(self.df)) * 100
+        
+        print(f"📊 Enhancement Summary:")
+        print(f"   • Total rows: {len(self.df)}")
+        print(f"   • Enhanced rows: {len(target_power_data)} ({enhancement_pct:.1f}%)")
+        
+        if len(target_power_data) > 0:
+            power_stats = f"{target_power_data.min():.1f}-{target_power_data.max():.1f}"
+            print(f"   • Target power range: {power_stats}")
+        
+        if len(target_cadence_data) > 0:
+            cadence_stats = f"{target_cadence_data.min():.1f}-{target_cadence_data.max():.1f}"
+            print(f"   • Target cadence range: {cadence_stats}")
+    
+
         
     def enhance_with_intervals(self, found_intervals: List[Dict]) -> pd.DataFrame:
         """
@@ -80,9 +102,10 @@ class TrainingEnhancer:
         self._print_enhancement_summary()
         
         return self.df
-    
+
+
     def _enhance_single_interval(self, interval: Dict) -> int:
-        """Enhance data for a single interval"""
+        """Enhance data for a single interval with COMPREHENSIVE debugging"""
         start_idx = interval['start_idx']
         end_idx = interval['end_idx']
         
@@ -96,27 +119,86 @@ class TrainingEnhancer:
         if interval_rows == 0:
             return 0
         
-        # Set target power
-        target_power_pct = interval.get('target_power_pct', 0)
+        # Get ALL power values for debugging
+        raw_power_pct = interval.get('target_power_pct', 0)
+        raw_power_low = interval.get('target_power_low_pct', 0)
+        raw_power_high = interval.get('target_power_high_pct', 0)
+        
+        print(f"🔍 Interval {interval.get('type')}:")
+        print(f"   Raw values - pct: {raw_power_pct}, low: {raw_power_low}, high: {raw_power_high}")
+        
+        # Convert from decimal to percentage
+        target_power_pct = raw_power_pct * 100
+        target_power_low_pct = raw_power_low * 100
+        target_power_high_pct = raw_power_high * 100
+        
+        print(f"   After % conversion - pct: {target_power_pct}%, low: {target_power_low_pct}%, high: {target_power_high_pct}%")
+        
         target_power_watts = interval.get('target_power', 0)
         
+        # Determine which power value to use
+        final_target_power = np.nan
+        power_source = 'none'
+        
+        # Priority 1: Direct wattage target
         if target_power_watts > 0:
-            # Direct wattage target
-            self.df.loc[mask, 'target_power'] = target_power_pct * self.ftp if self.ftp else target_power_pct
-            self.df.loc[mask, 'power_target_type'] = 'percentage'
+            final_target_power = target_power_watts
+            power_source = 'watts_direct'
+            print(f"   → Using direct wattage: {target_power_watts}W")
+        
+        # Priority 2: Use low/high for ramps
+        elif interval.get('power_type') in ['ramp_up', 'ramp_down'] and (target_power_low_pct > 0 or target_power_high_pct > 0):
+            # Ensure we have both values
+            if target_power_low_pct == 0:
+                target_power_low_pct = target_power_high_pct
+            elif target_power_high_pct == 0:
+                target_power_high_pct = target_power_low_pct
+            
+            avg_pct = (target_power_low_pct + target_power_high_pct) / 2.0
+            final_target_power = (avg_pct / 100.0) * self.ftp
+            power_source = 'ramp_avg'
+            print(f"   → Using ramp average: {avg_pct}% = {final_target_power}W")
+        
+        # Priority 3: Main percentage with FTP
         elif self.ftp and target_power_pct > 0:
-            # Convert percentage to watts using FTP
-            self.df.loc[mask, 'target_power'] = target_power_pct * self.ftp
-            self.df.loc[mask, 'power_target_type'] = 'watts'
+            final_target_power = (target_power_pct / 100.0) * self.ftp
+            power_source = 'percentage_ftp'
+            print(f"   → Converted {target_power_pct}% to {final_target_power}W (FTP: {self.ftp})")
+        
+        # Priority 4: Low/High average for steady intervals
+        elif self.ftp and (target_power_low_pct > 0 or target_power_high_pct > 0):
+            # If one is zero, use the other
+            if target_power_low_pct == 0:
+                target_power_low_pct = target_power_high_pct
+            elif target_power_high_pct == 0:
+                target_power_high_pct = target_power_low_pct
+            
+            avg_pct = (target_power_low_pct + target_power_high_pct) / 2.0
+            final_target_power = (avg_pct / 100.0) * self.ftp
+            power_source = 'low_high_avg_ftp'
+            print(f"   → Using low/high average: {avg_pct}% = {final_target_power}W")
+        
+        # Priority 5: Raw percentage (no FTP)
         elif target_power_pct > 0:
-            # Keep as percentage if no FTP available
-            self.df.loc[mask, 'target_power'] = target_power_pct
-            self.df.loc[mask, 'power_target_type'] = 'percentage'
+            final_target_power = target_power_pct
+            power_source = 'percentage_raw'
+            print(f"   → Using percentage (no FTP): {target_power_pct}%")
+        
+        else:
+            # No target power available
+            final_target_power = np.nan
+            power_source = 'none'
+            print(f"   → No target power available")
+        
+        # Set the target power
+        self.df.loc[mask, 'target_power'] = final_target_power
+        self.df.loc[mask, 'power_target_type'] = power_source
         
         # Set target cadence
         target_cadence = interval.get('target_cadence', 0)
         if target_cadence > 0:
             self.df.loc[mask, 'target_cadence'] = target_cadence
+            print(f"   → Target cadence: {target_cadence}rpm")
         
         # Set interval metadata
         self.df.loc[mask, 'interval_type'] = interval.get('type', 'unknown')
@@ -124,24 +206,6 @@ class TrainingEnhancer:
         
         return interval_rows
     
-    def _print_enhancement_summary(self) -> None:
-        """Print summary of enhancement"""
-        target_power_data = self.df['target_power'].dropna()
-        target_cadence_data = self.df['target_cadence'].dropna()
-        
-        enhancement_pct = (len(target_power_data) / len(self.df)) * 100
-        
-        print(f"📊 Enhancement Summary:")
-        print(f"   • Total rows: {len(self.df)}")
-        print(f"   • Enhanced rows: {len(target_power_data)} ({enhancement_pct:.1f}%)")
-        
-        if len(target_power_data) > 0:
-            power_stats = f"{target_power_data.min():.1f}-{target_power_data.max():.1f}"
-            print(f"   • Target power range: {power_stats}")
-        
-        if len(target_cadence_data) > 0:
-            cadence_stats = f"{target_cadence_data.min():.1f}-{target_cadence_data.max():.1f}"
-            print(f"   • Target cadence range: {cadence_stats}")
 
 def enhance_training_data(csv_path: Path, metadata_path: Path, found_intervals: List[Dict]) -> Tuple[pd.DataFrame, Dict]:
     """

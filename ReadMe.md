@@ -10,20 +10,47 @@ A comprehensive system for organizing, analyzing, and managing Zwift cycling tra
 Cycling_Data_Analysis/
 ├── Athlete/
 │   ├── Athlete_Name_1/
+│   │   ├── athlete_info.json
 │   │   ├── AllData/
 │   │   ├── ParsedData/
 │   │   ├── by_month/
+│   │   ├── by_zone/
 │   │   └── by_training/
 │   └── Athlete_Name_2/
 │       ├── AllData/
 │       ├── ParsedData/
 │       ├── by_month/
+│       ├── by_zone/
 │       └── by_training/
 ├── Trainings/
-├── organizer.py
+│   └── Z2_High_Cadence/
+│       ├── Z2_High_Cadence.zwo 
+│       ├── Z2_High_Cadence.xml
+│       ├── Z2_High_Cadence.json 
+│       └── Z2_High_Cadence.txt
+├── import_zwo.py
+├── remove_zwo.py
+├── import_and_parse.py
 ├── remove_training.py
+├── create_athlete.py
+├── training_class.py
+├── interval_class.py
+├── plotter_class.py
 └── README.md
 ```
+
+<details>
+<summary>Explaination</summary>
+### Trainings
+Contains the different training templates, for now only the ones extracted from zwift
+They can (and should) be imported and removed using the import\_zwo.py and the remove\_zwo.py, respecticely
+
+### Athlete
+
+Contains the different athletes.  new athlete should be added using create\_athlete.py. 
+A new training should be loaded using import\_and\_parse.py and removed using remove\_trainind.py. Once imported, the analysis is done by calling the main  
+<details>
+
 
 <details>
 <summary>Quick Start</summary>
@@ -40,7 +67,7 @@ Cycling_Data_Analysis/
 ### Adding Training Data
 
 ```bash
-python organizer.py
+python load_and_parse.py
 ```
 
 ### Removing Training Data
@@ -50,6 +77,35 @@ python remove_training.py
 ```
 
 </details>
+
+</details>
+<summary>Structure of the code <summary>
+
+### Organizer Tools
+
+* import.py: Takes in input the .fit file and creates the ParseData folder were the traing data will be stored and the symlinks in the by\_month and by\_type folders to the .fit file and the folder of the training 
+
+* remove.py: Removes the training
+
+* add\_and\_parse\_workout.py The function that from a .zwo file outputs the parsed trainign as a sequence of intervals 
+
+### Training Class: 
+```
+Training
+├── metadata  	 	 # Contains the metadata
+├── read_metadata(.json)  	 	 # A functions that reads the metadata from the metadata.json file 
+├── data # A pandas object that contains the data from the .fit file and then enhanced with some interval data 
+├── read_data()
+├── intervals # An intervals object which is a defined latet. Basically it is a sequential list of intervals with information about them
+├── interval_finder # It divides the traininf into intervals and marks the initinall and final times of the intervals, its kind and the zone. Now it simply reads the .json file parsed from the .zwo and we place them sequentially from time zero (we are assuming hte training is guided and we start the training at the same time of the guide without stops)
+├── interval_statistics # a class containing the fucntions that fill the interval object with statistics using the dat 
+├── intervals # An intervals object which is a defined latet
+├── plotter # A plotter object that visualizes the training 
+└── README.md
+```
+
+</details>
+
 
 <details>
 <summary>Scripts</summary>

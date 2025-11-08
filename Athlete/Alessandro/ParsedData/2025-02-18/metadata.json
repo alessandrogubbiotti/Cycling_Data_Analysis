@@ -1,0 +1,21 @@
+{
+    "athlete": "Alessandro",
+    "ride_name": "2025-02-18",
+    "date": "2025-02-18",
+    "time": "18:26",
+    "day_of_week": "Tuesday",
+    "training_type": "Z3",
+    "training_template": "Tempo3x20",
+    "ftp": 250,
+    "preworkout_nutrition": "Surplus",
+    "hydration_ml_pre": 200,
+    "hydration_ml_during": 500,
+    "minerals": {
+        "potassium_g": 2.0,
+        "magnesium_g": 2.0,
+        "zinc_g": 2.0,
+        "vitamin_c_g": 2.0
+    },
+    "perceived_effort": "Medium",
+    "notes": ""
+}

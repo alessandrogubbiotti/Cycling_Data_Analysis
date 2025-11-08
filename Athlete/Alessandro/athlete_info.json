@@ -1,0 +1,33 @@
+{
+    "name": "Alessandro",
+    "folder_name": "Alessandro",
+    "created_date": "2025-11-04T12:33:12.696450",
+    "personal_info": {
+        "birth_date": "1995-03-18",
+        "height_cm": 180.0,
+        "weight_kg": 77.0,
+        "ftp": 255,
+        "max_hr": 190,
+        "resting_hr": 72
+    },
+    "contact_info": {
+        "email": "alessandro@ale.it",
+        "phone": null
+    },
+    "training_preferences": {
+        "preferred_training_days": null,
+        "preferred_training_time": null,
+        "time_availability_hours": 10.0
+    },
+    "goals": {
+        "short_term": "Sprints",
+        "long_term": "?",
+        "target_events": null
+    },
+    "medical_notes": {
+        "injuries": null,
+        "limitations": null,
+        "medications": null
+    },
+    "notes": null
+}

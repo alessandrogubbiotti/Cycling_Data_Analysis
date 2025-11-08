@@ -1,0 +1,47 @@
+[
+  {
+    "start_time": 0.0,
+    "end_time": 600.0,
+    "duration": 600.0,
+    "xml_type": "warmup",
+    "target_power_pct": 0.0,
+    "target_power_low_pct": 32.179998999999995,
+    "target_power_high_pct": 74.979997,
+    "target_cadence": 0.0,
+    "description": "Warmup",
+    "source": "zwo",
+    "type": "warmup",
+    "zone_class": "Warm up",
+    "power_type": "ramp"
+  },
+  {
+    "start_time": 600.0,
+    "end_time": 6000.0,
+    "duration": 5400.0,
+    "xml_type": "steadystate",
+    "target_power_pct": 72.179997,
+    "target_power_low_pct": 0.0,
+    "target_power_high_pct": 0.0,
+    "target_cadence": 70.0,
+    "description": "SteadyState",
+    "source": "zwo",
+    "type": "steadystate",
+    "zone_class": "Z2",
+    "power_type": "steady"
+  },
+  {
+    "start_time": 6000.0,
+    "end_time": 6600.0,
+    "duration": 600.0,
+    "xml_type": "cooldown",
+    "target_power_pct": 0.0,
+    "target_power_low_pct": 80.180001,
+    "target_power_high_pct": 24.98,
+    "target_cadence": 0.0,
+    "description": "Cooldown",
+    "source": "zwo",
+    "type": "cooldown",
+    "zone_class": "Cooling down",
+    "power_type": "ramp"
+  }
+]
