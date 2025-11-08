@@ -1,0 +1,57 @@
+name: Deploy Cycling Analysis to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    # Optional: Auto-run analysis every Monday at 6 AM UTC
+    - cron: '0 6 * * 1'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          # Install specific FIT file parsing libraries
+          pip install fitparse pandas matplotlib seaborn plotly numpy
+
+      - name: Generate Analysis Reports and Plots
+        run: |
+          # Create necessary directories
+          mkdir -p _build/html/plots
+          mkdir -p _build/html/images
+          
+          # Run your analysis scripts (adjust to your actual script names)
+          echo "Running analysis scripts..."
+          # python scripts/organizer_scripts/main_analysis.py
+          # python scripts/interval_analysis.py  
+          # python scripts/workout_analysis.py
+
+      - name: Create comprehensive HTML report
+        run: |
+          python scripts/generate_html_report.py
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _build/html/
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

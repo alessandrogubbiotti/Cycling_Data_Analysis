@@ -26,7 +26,7 @@
     "description": "SteadyState",
     "source": "zwo",
     "type": "steadystate",
-    "zone_class": "Z1",
+    "zone_class": "Z2",
     "power_type": "steady"
   },
   {
@@ -41,7 +41,7 @@
     "description": "SteadyState",
     "source": "zwo",
     "type": "steadystate",
-    "zone_class": "Z1",
+    "zone_class": "Z2",
     "power_type": "steady"
   },
   {
@@ -56,7 +56,7 @@
     "description": "SteadyState",
     "source": "zwo",
     "type": "steadystate",
-    "zone_class": "Z1",
+    "zone_class": "Z3",
     "power_type": "steady"
   },
   {
@@ -71,7 +71,7 @@
     "description": "SteadyState",
     "source": "zwo",
     "type": "steadystate",
-    "zone_class": "Z1",
+    "zone_class": "Z5",
     "power_type": "steady"
   },
   {
@@ -101,7 +101,7 @@
     "description": "SteadyState",
     "source": "zwo",
     "type": "steadystate",
-    "zone_class": "Z1",
+    "zone_class": "Z4",
     "power_type": "steady"
   },
   {
@@ -131,7 +131,7 @@
     "description": "SteadyState",
     "source": "zwo",
     "type": "steadystate",
-    "zone_class": "Z1",
+    "zone_class": "Z3",
     "power_type": "steady"
   },
   {
@@ -146,7 +146,7 @@
     "description": "Ramp",
     "source": "zwo",
     "type": "ramp",
-    "zone_class": "Z1",
+    "zone_class": "Z3",
     "power_type": "ramp_up"
   },
   {
@@ -161,7 +161,7 @@
     "description": "Ramp",
     "source": "zwo",
     "type": "ramp",
-    "zone_class": "Z1",
+    "zone_class": "Z3",
     "power_type": "ramp_up"
   },
   {
@@ -176,7 +176,7 @@
     "description": "Ramp",
     "source": "zwo",
     "type": "ramp",
-    "zone_class": "Z1",
+    "zone_class": "Z3",
     "power_type": "ramp_up"
   },
   {
@@ -206,7 +206,7 @@
     "description": "SteadyState",
     "source": "zwo",
     "type": "steadystate",
-    "zone_class": "Z1",
+    "zone_class": "Z3",
     "power_type": "steady"
   },
   {
@@ -221,7 +221,7 @@
     "description": "Ramp",
     "source": "zwo",
     "type": "ramp",
-    "zone_class": "Z1",
+    "zone_class": "Z3",
     "power_type": "ramp_up"
   },
   {
@@ -236,7 +236,7 @@
     "description": "Ramp",
     "source": "zwo",
     "type": "ramp",
-    "zone_class": "Z1",
+    "zone_class": "Z3",
     "power_type": "ramp_up"
   },
   {
@@ -251,7 +251,7 @@
     "description": "Ramp",
     "source": "zwo",
     "type": "ramp",
-    "zone_class": "Z1",
+    "zone_class": "Z3",
     "power_type": "ramp_up"
   },
   {
@@ -281,7 +281,7 @@
     "description": "SteadyState",
     "source": "zwo",
     "type": "steadystate",
-    "zone_class": "Z1",
+    "zone_class": "Z3",
     "power_type": "steady"
   },
   {
@@ -296,7 +296,7 @@
     "description": "Ramp",
     "source": "zwo",
     "type": "ramp",
-    "zone_class": "Z1",
+    "zone_class": "Z3",
     "power_type": "ramp_up"
   },
   {
@@ -311,7 +311,7 @@
     "description": "Ramp",
     "source": "zwo",
     "type": "ramp",
-    "zone_class": "Z1",
+    "zone_class": "Z3",
     "power_type": "ramp_up"
   },
   {
@@ -326,7 +326,7 @@
     "description": "Ramp",
     "source": "zwo",
     "type": "ramp",
-    "zone_class": "Z1",
+    "zone_class": "Z3",
     "power_type": "ramp_up"
   },
   {

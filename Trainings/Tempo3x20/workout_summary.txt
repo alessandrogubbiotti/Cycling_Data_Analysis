@@ -1,5 +1,5 @@
 Workout Summary:
 Total duration: 84.0 minutes
 Number of intervals: 24
-Zone classes: Z1(24)
+Zone classes: Z1(7), Z2(2), Z3(13), Z5(1), Z4(1)
 Power types: ramp_up(10), steady(13), ramp_down(1)
