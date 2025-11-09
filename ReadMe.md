@@ -1,6 +1,8 @@
-# Cycling Data Analysis System
+# 🚴 Cycling Data Analysis
 
-A comprehensive system for organizing, analyzing, and managing Zwift cycling training data with automated parsing and structured storage.
+> 🌐 **Live Dashboard:** [View Interactive Dashboard](https://alessandrogubbiotti.github.io/Cycling_Data_Analysis/)
+
+A system vor visualizing and analyzing cycling data taken (for now) from zwift. The work is under construction and for now only some plotting tools and some basic statistics are available
 
 ![Python](https://img.shields.io/badge/Python-3.7%2B-blue) ![License](https://img.shields.io/badge/License-MIT-green)
 
